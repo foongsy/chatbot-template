@@ -7,16 +7,17 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from supabase.client import Client, create_client
 
+# https://python.langchain.com/v0.2/docs/integrations/vectorstores/supabase/
+# Make sure the vector length is the same as the output of your selected embedding model
+
 load_dotenv(find_dotenv())
 
 supabase_url = os.environ.get("SUPABASE_URL")
-supabase_key = os.environ.get("SUPABASE_SERVICE_KEY")
+supabase_key = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(supabase_url, supabase_key)
 
-embedding = HuggingFaceEmbeddings('BAAI/BAAI/bge-base-en-v1.5')
+embedding = HuggingFaceEmbeddings(model_name='BAAI/bge-base-en-v1.5')
 
-loader = DirectoryLoader('../data/')
-loader.load()
 
 text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
     model_name="gpt-4",
@@ -24,14 +25,15 @@ text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
     chunk_overlap=200,
 )
 
-"""
-https://www.info.gov.hk/gia/general/202406/20/P2024062000509.htm
-https://www.info.gov.hk/gia/general/202406/18/P2024061800321.htm
-https://www.info.gov.hk/gia/general/202406/13/P2024061300581.htm
-https://www.info.gov.hk/gia/general/202406/13/P2024061300577.htm
-https://www.info.gov.hk/gia/general/202406/11/P2024061100446.htm
-https://www.info.gov.hk/gia/general/202406/11/P2024061100020.htm
-https://www.info.gov.hk/gia/general/202406/07/P2024060600612.htm
-https://www.info.gov.hk/gia/general/202406/06/P2024060600363.htm
-https://www.info.gov.hk/gia/general/202406/04/P2024060400339.htm
-"""
+loader = DirectoryLoader('../data/')
+raw_docs = loader.load()
+docs = text_splitter.split_documents(raw_docs)
+
+vector_store = SupabaseVectorStore.from_documents(
+    docs,
+    embedding,
+    client=supabase,
+    table_name="documents",
+    query_name="match_documents",
+    chunk_size=500,
+)
