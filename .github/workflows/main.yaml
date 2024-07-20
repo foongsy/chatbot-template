@@ -92,8 +92,7 @@ jobs:
           source: ./
           env_vars: |-
             KEY_TOGETHERAI=${{ secrets.KEY_TOGETHERAI }}
-          with:
-            flags: '--allow-unauthenticated'  
+          flags: '--allow-unauthenticated'  
 
       # If required, use the Cloud Run url output in later steps
       - name: Show Output
