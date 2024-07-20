@@ -53,7 +53,7 @@ on: [workflow_dispatch]
 
 env:
   PROJECT_ID: vtxclass # TODO: update Google Cloud project id
-  SERVICE: henry-chainlit # TODO: update Cloud Run service name
+  SERVICE: henry-chainlit # TODO: update Cloud Run service name, or use github variables, ${{ vars.SERVICE_NAME }}
   REGION: asia-northeast1 # TODO: update Cloud Run service region
   KEY_TOGETHERAI: ${{ secrets.KEY_TOGETHERAI }}
 
