@@ -164,3 +164,4 @@ data/*
 .chainlit/
 *.json
 chainlit.md
+.DS_Store

@@ -3,9 +3,19 @@ from langchain_core.prompts.chat import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import Runnable
 from langchain_core.runnables.config import RunnableConfig
+from typing import Optional, Dict
 
 import chainlit as cl
 import os
+
+@cl.oauth_callback
+def oauth_callback(
+  provider_id: str,
+  token: str,
+  raw_user_data: Dict[str, str],
+  default_user: cl.User,
+) -> Optional[cl.User]:
+  return default_user
 
 @cl.on_chat_start
 async def on_chat_start():
