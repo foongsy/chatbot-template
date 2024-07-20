@@ -3,10 +3,16 @@ from langchain_core.prompts.chat import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import Runnable
 from langchain_core.runnables.config import RunnableConfig
-from typing import Optional, Dict
 
 import chainlit as cl
 import os
+
+"""
+# Uncomment this code block and add follow variables to enable descope authentication
+# Reference: https://docs.chainlit.io/authentication/oauth#descope
+# OAUTH_DESCOPE_CLIENT_ID
+# OAUTH_DESCOPE_CLIENT_SECRET
+# CHAINLIT_AUTH_SECRET <-- run `chainlit create-secret` for a new secret value 
 
 @cl.oauth_callback
 def oauth_callback(
@@ -16,6 +22,7 @@ def oauth_callback(
   default_user: cl.User,
 ) -> Optional[cl.User]:
   return default_user
+"""
 
 @cl.on_chat_start
 async def on_chat_start():
@@ -30,7 +37,7 @@ async def on_chat_start():
         [
             (
                 "system",
-                "You're a very knowledgeable historian who provides accurate and eloquent answers to historical questions.",
+                "You're a friendly chatbot who speaks in Traditional Chinese only. Be funny and easy to chat with about general topics in life. Joke around when you don't have an answer to the question.",
             ),
             ("human", "{question}"),
         ]
