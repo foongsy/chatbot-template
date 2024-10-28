@@ -1,8 +1,10 @@
 from langchain_openai import ChatOpenAI
+from langchain_together import ChatTogether
 from langchain_core.prompts.chat import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import Runnable
-from langchain_core.runnables.config import RunnableConfig
+from langchain_core.runnables import RunnableConfig
+from typing import cast
 
 import chainlit as cl
 import os
@@ -27,17 +29,22 @@ def oauth_callback(
 @cl.on_chat_start
 async def on_chat_start():
     # Default usage of TogetherAI
+    """
     model = ChatOpenAI(
         base_url="https://api.together.xyz/v1",
         api_key=os.environ["KEY_TOGETHERAI"],
         model="mistralai/Mixtral-8x7B-Instruct-v0.1",
+        streaming=True,)
+    """
+    model = ChatTogether(
+        model="mistralai/Mixtral-8x22B-Instruct-v0.1",
         streaming=True,)
     
     prompt = ChatPromptTemplate.from_messages(
         [
             (
                 "system",
-                "You're a friendly chatbot who speaks in Traditional Chinese only. Be funny and easy to chat with about general topics in life. Joke around when you don't have an answer to the question.",
+                "You're a friendly chatbot. Be funny and easy to chat with about general topics in life. Joke around when you don't have an answer to the question. Use Traditional Chinese only.",
             ),
             ("human", "{question}"),
         ]
@@ -48,7 +55,7 @@ async def on_chat_start():
 
 @cl.on_message
 async def on_message(message: cl.Message):
-    runnable = cl.user_session.get("runnable")  # type: Runnable
+    runnable = cast(Runnable, cl.user_session.get("runnable"))  # type: Runnable
 
     msg = cl.Message(content="")
 
