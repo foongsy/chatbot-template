@@ -1,13 +1,17 @@
 from langchain_openai import ChatOpenAI
 from langchain_together import ChatTogether
+from langchain_mistralai import ChatMistralAI
 from langchain_core.prompts.chat import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import Runnable
 from langchain_core.runnables import RunnableConfig
 from typing import cast
+from dotenv import load_dotenv
 
 import chainlit as cl
 import os
+
+load_dotenv()
 
 """
 # Uncomment this code block and add follow variables to enable descope authentication
@@ -26,7 +30,7 @@ def oauth_callback(
   return default_user
 """
 
-@cl.on_chat_start
+@cl.on_chat_start # decorator
 async def on_chat_start():
     # Default usage of TogetherAI
     """
@@ -36,8 +40,9 @@ async def on_chat_start():
         model="mistralai/Mixtral-8x7B-Instruct-v0.1",
         streaming=True,)
     """
-    model = ChatTogether(
-        model="mistralai/Mixtral-8x22B-Instruct-v0.1",
+    model = ChatMistralAI(
+        model="open-mixtral-8x22b",
+        temperature=1,
         streaming=True,)
     
     prompt = ChatPromptTemplate.from_messages(
@@ -49,15 +54,32 @@ async def on_chat_start():
             ("human", "{question}"),
         ]
     )
-    runnable = prompt | model | StrOutputParser()
+    runnable = prompt | model | StrOutputParser() # prompt -> model -> StrOutputParser()
+    """
+    def StrOutputParser(x):
+        return(x['content'])
+    """
     cl.user_session.set("runnable", runnable)
 
+"""
+System: <system prompt>
+Human: <human prompt1>
+Assistant: <assistant prompt1>
+Human: <human prompt2>
+Assistant: <assistant prompt2>
+Human: <human prompt3>
+Assistant: <assistant prompt3>
+
+
+"""
 
 @cl.on_message
 async def on_message(message: cl.Message):
-    runnable = cast(Runnable, cl.user_session.get("runnable"))  # type: Runnable
+    # runnable = cast(Runnable, cl.user_session.get("runnable"))  # type: Runnable
+    runnable = cl.user_session.get("runnable")
 
     msg = cl.Message(content="")
+    # runnable.invoke({"question": message.content})
 
     async for chunk in runnable.astream(
         {"question": message.content},

@@ -6,7 +6,7 @@ import faiss
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 
-from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import TokenTextSplitter
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -31,7 +31,7 @@ text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
     chunk_overlap=200,
 )
 
-loader = DirectoryLoader('../data/')
+loader = TextLoader('../data/bipartisan_debates/bipartisan_debates/trump_harris_debate.txt')
 raw_docs = loader.load()
 docs = text_splitter.split_documents(raw_docs)
 """
